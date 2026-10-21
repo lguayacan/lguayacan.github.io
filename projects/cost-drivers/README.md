@@ -20,7 +20,7 @@
 | Hold-out MAPE (USD) | 16.5% | 18.2% |
 | Max VIF | 1.35 | 1.35 |
 
-**Files:** [Workbook (Google Sheets, view only)](LINK_TO_SHEET)
+**Files:** [Workbook (Google Sheets, view only)](https://docs.google.com/spreadsheets/d/1jrkQK8xU0KgfrN2sBaBLlRjyGQhfCEiyYnnbrmjkeOc/edit?usp=sharing)
 
 <details>
 <summary>Method</summary>
