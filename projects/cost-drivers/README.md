@@ -1,6 +1,6 @@
 # What drives construction cost?
 
-**Multiple regression on 6,123 construction projects** | Laura Camila Guayacan Ardila, civil engineer (cost estimation and quantity surveying)
+**Multiple regression on 6,123 construction projects** | Laura Camila Guayacan Ardila
 
 **Question:** which project factors explain total cost, and how reliably can a model predict it?
 
