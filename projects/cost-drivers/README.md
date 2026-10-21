@@ -35,7 +35,7 @@
 <details>
 <summary>Data and limitations</summary>
 
-- Kaggle "Deep Learning Building Cost Dataset" (colabsss, CC0), 6,123 rows, 21 columns. It appears synthetic (nearly independent predictors), so results show method, not real market behaviour.
+- [Kaggle "Deep Learning Building Cost Dataset"](https://www.kaggle.com/datasets/colabsss/deep-learning-building-cost-dataset) (colabsss, CC0), 6,123 rows, 21 columns. It appears synthetic (nearly independent predictors), so results show method, not real market behaviour.
 - `equipment_cost` is probably a cost component rather than a driver (see the [SQL case study](../sql-outliers/)).
 - No actual-versus-planned costs. Correlation, not causation.
 </details>
