@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Construction Cost Dashboard | Laura Camila Guayacan Ardila</title>
+<meta name="description" content="Interactive cost control dashboard: cost drivers, scenario analysis, estimate range and unit cost variance watchlist, built on a regression model and SQL analysis.">
+<style>
+  :root { color-scheme: light;
+    --bg:#ffffff; --surface:#f6f8fb; --text:#0b0b0b; --text2:#52514e; --line:#dfe5ee; --accent:#2a78d6; --neutral:#9a9a96; --warn:#b45309; --warnbg:#fdf3e3; --good:#0e7a4f; }
+  @media (prefers-color-scheme: dark) { :root { color-scheme: dark;
+    --bg:#10151d; --surface:#182130; --text:#f0efec; --text2:#c3c2b7; --line:#2a3750; --accent:#3987e5; --neutral:#7c7c78; --warn:#f0b458; --warnbg:#2a2113; --good:#5fd0a0; } }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+  main { max-width:1040px; margin:0 auto; padding:32px 16px 56px; }
+  h1 { font-size:1.6rem; margin:0 0 4px; }
+  h2 { font-size:1.15rem; margin:0 0 4px; }
+  .sub { color:var(--text2); margin:0 0 16px; }
+  .note { background:var(--warnbg); border:1px solid var(--line); border-left:4px solid var(--warn); padding:10px 14px; border-radius:6px; font-size:.88rem; margin-bottom:24px; }
+  section.panel { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:20px; }
+  .grid { display:grid; gap:20px; grid-template-columns:1fr 1fr; }
+  @media (max-width:760px){ .grid{ grid-template-columns:1fr; } }
+  .barrow { display:grid; grid-template-columns:150px 1fr 70px; gap:8px; align-items:center; margin:6px 0; font-size:.86rem; }
+  .barrow .lab { color:var(--text2); overflow-wrap:anywhere; }
+  .track { background:transparent; height:16px; position:relative; }
+  .bar { height:16px; background:var(--accent); border-radius:0 4px 4px 0; min-width:2px; }
+  .bar.ns { background:var(--neutral); }
+  .bar.neg { background:var(--warn); }
+  .val { text-align:right; font-variant-numeric:tabular-nums; }
+  .legend { font-size:.8rem; color:var(--text2); margin-top:8px; }
+  .swatch { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:middle; }
+  .interp { margin-top:14px; padding:10px 14px; border-left:4px solid var(--accent); background:var(--bg); border-radius:0 6px 6px 0; font-size:.92rem; }
+  .interp b.t { display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; color:var(--text2); margin-bottom:2px; }
+  label { display:block; font-size:.85rem; margin-top:12px; color:var(--text2); }
+  label span.v { float:right; color:var(--text); font-variant-numeric:tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--accent); }
+  select { width:100%; padding:6px; border:1px solid var(--line); background:var(--bg); color:var(--text); border-radius:6px; }
+  .kpis { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+  .kpi { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .kpi .n { font-size:1.3rem; font-weight:bold; font-variant-numeric:tabular-nums; }
+  .kpi .l { font-size:.75rem; color:var(--text2); }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th,td { text-align:right; padding:6px 8px; border-bottom:1px solid var(--line); }
+  th:first-child,td:first-child { text-align:left; }
+  th { color:var(--text2); font-weight:normal; }
+  button { background:var(--accent); color:#fff; border:0; border-radius:6px; padding:7px 12px; cursor:pointer; margin-top:14px; font-size:.85rem; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  footer { color:var(--text2); font-size:.82rem; margin-top:24px; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Construction Cost Control Dashboard</h1>
+  <p class="sub">Laura Camila Guayacan Ardila | Cost drivers, scenario analysis, estimate range and unit cost variance</p>
+  <div class="note"><b>Read first:</b> the data comes from a public synthetic dataset (6,123 projects), so figures illustrate the method and are not market benchmarks. Numbers are calculated from the regression equation. The "Interpretation" boxes are text written from the verified results; no AI model runs in this page.</div>
+
+  <section class="panel" aria-labelledby="p1">
+    <h2 id="p1">1. Cost drivers</h2>
+    <p class="sub">Change in project cost for a typical (+1 standard deviation) increase in each factor. Linear regression, 6,123 projects.</p>
+    <div id="drivers"></div>
+    <div class="legend"><span class="swatch" style="background:var(--accent)"></span>Statistically significant (p &lt; 0.05) &nbsp; <span class="swatch" style="background:var(--neutral)"></span>Not significant &nbsp; <span class="swatch" style="background:var(--warn)"></span>Negative effect</div>
+    <div class="interp"><b class="t">Interpretation</b>Area explains most of the cost: a typical increase in area moves cost by about USD 486k, more than ten times the next factor. Equipment, floors, labor index and material index are significant but small. Weather, risk, complexity and the categorical choices (type, location, construction, foundation) cannot be distinguished from zero in this dataset.</div>
+  </section>
+
+  <section class="panel" aria-labelledby="p2">
+    <h2 id="p2">2. Scenario analysis and estimate range</h2>
+    <p class="sub">Adjust the project. The baseline is the median project. The estimate uses the log-log model (R&sup2; 0.87).</p>
+    <div class="grid">
+      <div id="controls"></div>
+      <div>
+        <div class="kpis">
+          <div class="kpi"><div class="n" id="k-est">-</div><div class="l">Estimated cost (point)</div></div>
+          <div class="kpi"><div class="n" id="k-chg">-</div><div class="l">Change vs baseline</div></div>
+          <div class="kpi"><div class="n" id="k-rng">-</div><div class="l">Estimate range (about 80%)</div></div>
+          <div class="kpi"><div class="n" id="k-cps">-</div><div class="l">Unit cost (USD per sq ft)</div></div>
+        </div>
+        <h3 style="font-size:.95rem;margin:14px 0 4px">Sensitivity: cost change for +10% in each driver</h3>
+        <div id="tornado"></div>
+        <div class="interp" id="interp"><b class="t">Interpretation</b><span id="interp-text"></span></div>
+        <button id="reset" type="button">Reset to baseline</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="p3">
+    <h2 id="p3">3. Unit cost variance watchlist</h2>
+    <p class="sub">Projects whose cost per sq ft is above the IQR screening threshold (USD 194.85 per sq ft): 423 of 6,123 (6.9%). SQL analysis in BigQuery.</p>
+    <div class="grid">
+      <div>
+        <h3 style="font-size:.95rem;margin:0 0 4px">Share of projects flagged, by area</h3>
+        <div id="flag"></div>
+      </div>
+      <div>
+        <h3 style="font-size:.95rem;margin:0 0 4px">Equipment cost as a share of total cost</h3>
+        <div id="equip"></div>
+      </div>
+    </div>
+    <h3 style="font-size:.95rem;margin:16px 0 4px">Highest unit cost projects</h3>
+    <div style="overflow-x:auto"><table><thead><tr><th>Project</th><th>Type</th><th>Area (sq ft)</th><th>Cost (USD)</th><th>USD per sq ft</th><th>Equipment (USD)</th></tr></thead><tbody id="toprows"></tbody></table></div>
+    <div class="interp"><b class="t">Interpretation</b>The flag is a size effect, not a project type effect: 84% of projects under 2,000 sq ft are flagged and none above 5,000 sq ft. Equipment cost is a near-constant USD 100k, so it weighs 32% of cost on small projects and 7% on large ones. Removing it halves the flagged projects (423 to 205). The rest is unexplained here; other fixed costs such as mobilization or permits are a plausible, untested hypothesis. For small projects, review fixed costs and allow a larger contingency.</div>
+  </section>
+
+  <footer>Method: multiple regression (OLS), validated against Python statsmodels; outliers by the IQR rule in SQL. Source data: Kaggle "Deep Learning Building Cost Dataset" (CC0). Estimate range assumes roughly normal log errors; heteroscedasticity is present, so treat the range as indicative.</footer>
+</main>
+<script>
+const D = {"intercept":7.538514360261735,"coef":{"total_area_sqft":0.6621649907888469,"num_floors":0.00697937493685605,"material_quality_index":-0.038725687059336204,"labor_cost_index":0.023135823643641956,"material_cost_index":0.02881515130997138,"inflation_rate":0.002922591811077651,"equipment_cost":8.968271519813567e-07,"contractor_experience_years":-1.1390488002022809e-05,"avg_temperature":-9.564117196359298e-05,"rainfall_index":0.019648651868855255,"weather_delay_days":6.0122087194307674e-05,"complexity_score":0.032879965477263615,"risk_index":-0.0020800357370819103,"resource_utilization_rate":0.0032362907408299783,"type_Industrial":0.003147951332816268,"type_Residential":0.004900307619710583,"location_SemiUrban":0.0028368894678781047,"location_Urban":0.0026125114215794385,"construction_RCC":0.003145743083111524,"construction_Steel":-0.0014619557968207596,"foundation_Raft":0.005066144279277139,"foundation_Strip":0.0016697563105920925},"p2":{"total_area_sqft":0.0,"num_floors":9.082928178908342e-26,"material_quality_index":0.03782319569163349,"labor_cost_index":0.002684265289945081,"material_cost_index":1.1233034602753499e-07,"inflation_rate":0.05697134229031572,"equipment_cost":2.6914158729493903e-76,"contractor_experience_years":0.9715413173932528,"avg_temperature":0.7958491162311998,"rainfall_index":0.03233620816410739,"weather_delay_days":0.6957433125685598,"complexity_score":0.00450545380290127,"risk_index":0.8395250249734607,"resource_utilization_rate":0.8590969121408378,"type_Industrial":0.6317972219032926,"type_Residential":0.4519654324047369,"location_SemiUrban":0.6651265188127178,"location_Urban":0.6894824837295604,"construction_RCC":0.6293235142736465,"construction_Steel":0.8224741950684813,"foundation_Raft":0.4375456770300209,"foundation_Strip":0.7962383752005348},"se":0.20828370589190812,"smear":1.0217540962360567,"median":{"total_area_sqft":10343.0,"num_floors":7.0,"material_quality_index":0.748,"labor_cost_index":1.399,"material_cost_index":1.65,"inflation_rate":5.95,"equipment_cost":101209.0,"contractor_experience_years":15.0,"avg_temperature":27.54,"rainfall_index":0.498,"weather_delay_days":30.0,"complexity_score":0.604,"risk_index":0.557,"resource_utilization_rate":0.748},"min":{"total_area_sqft":505.0,"num_floors":1.0,"material_quality_index":0.5,"labor_cost_index":0.8,"material_cost_index":0.8,"inflation_rate":3.0,"equipment_cost":5013.0,"contractor_experience_years":1.0,"avg_temperature":15.0,"rainfall_index":0.0,"weather_delay_days":0.0,"complexity_score":0.2,"risk_index":0.1,"resource_utilization_rate":0.5},"max":{"total_area_sqft":19991.0,"num_floors":14.0,"material_quality_index":1.0,"labor_cost_index":2.0,"material_cost_index":2.5,"inflation_rate":9.0,"equipment_cost":199930.0,"contractor_experience_years":29.0,"avg_temperature":40.0,"rainfall_index":1.0,"weather_delay_days":59.0,"complexity_score":1.0,"risk_index":1.0,"resource_utilization_rate":1.0},"effects":[{"name":"total_area_sqft","eff":486372.05226526613,"sig":true},{"name":"equipment_cost","eff":39714.182198199196,"sig":true},{"name":"num_floors","eff":22246.26733552179,"sig":true},{"name":"labor_cost_index","eff":11498.941369507624,"sig":true},{"name":"material_cost_index","eff":10575.649413390523,"sig":true},{"name":"complexity_score","eff":5754.421276845417,"sig":false},{"name":"material_quality_index","eff":-5050.5516554422775,"sig":false},{"name":"rainfall_index","eff":3883.0192922768465,"sig":false}],"top":[{"id":3635,"type":"Industrial","area":505,"cost":339907,"cps":673.1,"eq":198334},{"id":5406,"type":"Residential","area":512,"cost":328997,"cps":642.6,"eq":149201},{"id":5772,"type":"Residential","area":558,"cost":355338,"cps":636.8,"eq":199731},{"id":5961,"type":"Industrial","area":562,"cost":349946,"cps":622.7,"eq":192283},{"id":3651,"type":"Residential","area":514,"cost":307301,"cps":597.9,"eq":140825},{"id":3020,"type":"Residential","area":545,"cost":319392,"cps":586.0,"eq":191085},{"id":2458,"type":"Commercial","area":548,"cost":316878,"cps":578.2,"eq":198286},{"id":2031,"type":"Industrial","area":556,"cost":318476,"cps":572.8,"eq":142816}],"cps_median":112.07115428055117,"fence":194.8451739};
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const usd = n => 'USD ' + fmt(n);
+const pct = (n,dp=1) => (n>=0?'+':'') + (n*100).toFixed(dp) + '%';
+const NAMES = {total_area_sqft:'Total area',num_floors:'Number of floors',equipment_cost:'Equipment cost',labor_cost_index:'Labor cost index',material_cost_index:'Material cost index',complexity_score:'Complexity score',material_quality_index:'Material quality index',rainfall_index:'Rainfall index',inflation_rate:'Inflation rate',construction_RCC:'Construction: RCC',construction_Steel:'Construction: Steel',contractor_experience_years:'Contractor experience',risk_index:'Risk index'};
+const nice = k => NAMES[k] || k.replace(/_/g,' ');
+
+// Panel 1: drivers
+(function(){
+  const max = Math.max(...D.effects.map(e=>Math.abs(e.eff)));
+  document.getElementById('drivers').innerHTML = D.effects.map(e=>{
+    const w = Math.max(1, Math.abs(e.eff)/max*100);
+    const cls = e.eff<0 ? 'neg' : (e.sig ? '' : 'ns');
+    return `<div class="barrow"><div class="lab">${nice(e.name)}</div><div class="track"><div class="bar ${cls}" style="width:${w}%" title="${nice(e.name)}: ${fmt(e.eff)} USD per +1 SD"></div></div><div class="val">${e.eff<0?'-':''}${fmt(Math.abs(e.eff)/1000)}k</div></div>`;
+  }).join('');
+})();
+
+// Panel 2: model
+const CATS = [
+  {id:'type', label:'Project type', opts:[['Commercial',null],['Industrial','type_Industrial'],['Residential','type_Residential']]},
+  {id:'loc', label:'Location', opts:[['Rural',null],['Semi-Urban','location_SemiUrban'],['Urban','location_Urban']]},
+  {id:'con', label:'Construction type', opts:[['Hybrid',null],['RCC','construction_RCC'],['Steel','construction_Steel']]},
+  {id:'fnd', label:'Foundation', opts:[['Pile',null],['Raft','foundation_Raft'],['Strip','foundation_Strip']]}
+];
+const NUM = [
+  {k:'total_area_sqft', step:100},{k:'num_floors', step:1},{k:'equipment_cost', step:1000},
+  {k:'labor_cost_index', step:0.01},{k:'material_cost_index', step:0.01},{k:'complexity_score', step:0.01}
+];
+const base = Object.assign({}, D.median);
+let state = Object.assign({}, base, {type:'Commercial', loc:'Rural', con:'Hybrid', fnd:'Pile'});
+function mu(s){
+  let m = D.intercept;
+  for (const k in D.coef){
+    if (k==='total_area_sqft') m += D.coef[k]*Math.log(s[k]);
+    else if (k in D.median) m += D.coef[k]*s[k];
+  }
+  for (const c of CATS){ const o = c.opts.find(o=>o[0]===s[c.id]); if (o && o[1]) m += D.coef[o[1]]; }
+  return m;
+}
+const est = s => Math.exp(mu(s))*D.smear;
+const Z80 = 1.2816;
+function ctl(){
+  const el = document.getElementById('controls');
+  el.innerHTML = NUM.map(n=>`<label for="in-${n.k}">${nice(n.k)}<span class="v" id="v-${n.k}"></span></label><input type="range" id="in-${n.k}" min="${D.min[n.k]}" max="${D.max[n.k]}" step="${n.step}" value="${state[n.k]}">`).join('') +
+    CATS.map(c=>`<label for="in-${c.id}">${c.label}</label><select id="in-${c.id}">${c.opts.map(o=>`<option>${o[0]}</option>`).join('')}</select>`).join('');
+  NUM.forEach(n=>document.getElementById('in-'+n.k).addEventListener('input',e=>{state[n.k]=parseFloat(e.target.value);render();}));
+  CATS.forEach(c=>document.getElementById('in-'+c.id).addEventListener('change',e=>{state[c.id]=e.target.value;render();}));
+}
+function setCtl(){
+  NUM.forEach(n=>{document.getElementById('in-'+n.k).value=state[n.k];});
+  CATS.forEach(c=>{document.getElementById('in-'+c.id).value=state[c.id];});
+}
+function render(){
+  NUM.forEach(n=>{ const v=state[n.k]; document.getElementById('v-'+n.k).textContent = n.k==='equipment_cost' ? usd(v) : (n.step<1 ? v.toFixed(2) : fmt(v)); });
+  const e = est(state), e0 = est(Object.assign({},base,{type:'Commercial',loc:'Rural',con:'Hybrid',fnd:'Pile'}));
+  const m = mu(state);
+  const lo = Math.exp(m-Z80*D.se)*D.smear, hi = Math.exp(m+Z80*D.se)*D.smear;
+  const cps = e/state.total_area_sqft;
+  document.getElementById('k-est').textContent = usd(e);
+  document.getElementById('k-chg').textContent = pct(e/e0-1);
+  document.getElementById('k-rng').textContent = (lo/1e6).toFixed(2)+'M to '+(hi/1e6).toFixed(2)+'M';
+  document.getElementById('k-cps').textContent = cps.toFixed(0);
+  // tornado
+  const drivers = NUM.map(n=>{ const s2=Object.assign({},state); s2[n.k]=state[n.k]*1.1; return {k:n.k, d:est(s2)-e}; }).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
+  const mx = Math.max(...drivers.map(x=>Math.abs(x.d)),1);
+  document.getElementById('tornado').innerHTML = drivers.map(x=>`<div class="barrow"><div class="lab">${nice(x.k)}</div><div class="track"><div class="bar" style="width:${Math.max(1,Math.abs(x.d)/mx*100)}%" title="${nice(x.k)} +10%: ${fmt(x.d)} USD"></div></div><div class="val">${x.d>=0?'+':''}${fmt(x.d/1000)}k</div></div>`).join('');
+  // interpretation (rule-based text)
+  const parts = [];
+  const changed = [];
+  for (const n of NUM){ const b=base[n.k], v=state[n.k]; if (Math.abs(v-b)>1e-9){ const dm = n.k==='total_area_sqft' ? D.coef[n.k]*(Math.log(v)-Math.log(b)) : D.coef[n.k]*(v-b); changed.push({k:n.k,dm}); } }
+  for (const c of CATS){ const o=c.opts.find(o=>o[0]===state[c.id]); if (o&&o[1]) changed.push({k:o[1],dm:D.coef[o[1]]}); }
+  if (!changed.length) parts.push('The scenario equals the baseline (median project). Move a slider to see its effect.');
+  else {
+    changed.sort((a,b)=>Math.abs(b.dm)-Math.abs(a.dm));
+    const top = changed[0];
+    parts.push(`The scenario estimate is ${pct(e/e0-1)} versus the baseline (${usd(e0)}). The largest contributor is ${nice(top.k).toLowerCase()}.`);
+  }
+  parts.push(`The estimate range of ${usd(lo)} to ${usd(hi)} suggests an allowance of about ${pct(hi/e-1,0)} above the point estimate for a prudent budget.`);
+  if (cps > D.fence) parts.push(`Estimated unit cost (USD ${cps.toFixed(0)} per sq ft) is above the screening threshold of USD ${D.fence.toFixed(0)}. Small projects carry fixed costs such as equipment, so review those items and consider extra contingency.`);
+  else if (cps < D.cps_median*0.8) parts.push(`Estimated unit cost (USD ${cps.toFixed(0)} per sq ft) is below the median of USD ${D.cps_median.toFixed(0)}, consistent with economies of scale on larger projects.`);
+  if (state.total_area_sqft<=1000) parts.push('Projects this small are rare in the data, so the estimate is less reliable.');
+  document.getElementById('interp-text').textContent = parts.join(' ');
+}
+ctl(); render();
+document.getElementById('reset').addEventListener('click',()=>{ state=Object.assign({},base,{type:'Commercial',loc:'Rural',con:'Hybrid',fnd:'Pile'}); setCtl(); render(); });
+
+// Panel 3 (static results from SQL)
+function bars(id, rows, color){
+  const max = Math.max(...rows.map(r=>r.v),1);
+  document.getElementById(id).innerHTML = rows.map(r=>`<div class="barrow"><div class="lab">${r.l}</div><div class="track"><div class="bar" style="width:${Math.max(r.v/max*100,0.5)}%;background:${color}" title="${r.l}: ${r.v}%"></div></div><div class="val">${r.v.toFixed(1)}%</div></div>`).join('');
+}
+const BANDS = ['Under 2,000 sq ft','2,000 to 4,999','5,000 to 9,999','10,000 or more'];
+bars('flag', [84.3,6.1,0,0].map((v,i)=>({l:BANDS[i],v})), 'var(--accent)');
+bars('equip', [31.7,20.4,12.4,7.2].map((v,i)=>({l:BANDS[i],v})), 'var(--accent)');
+document.getElementById('toprows').innerHTML = D.top.map(r=>`<tr><td>${r.id}</td><td>${r.type}</td><td>${fmt(r.area)}</td><td>${fmt(r.cost)}</td><td>${r.cps.toFixed(0)}</td><td>${fmt(r.eq)}</td></tr>`).join('');
+</script>
+</body>
+</html>
