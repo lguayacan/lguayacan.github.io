@@ -37,4 +37,4 @@ projects/sql-outliers/      Case study 2: SQL (README, queries.sql + charts)
 
 ## Data and limitations
 
-Source: Kaggle "Deep Learning Building Cost Dataset". It is public and likely synthetic, so findings illustrate method rather than real-world cost benchmarks. Each case study lists its own limitations.
+Source: [Kaggle "Deep Learning Building Cost Dataset"](https://www.kaggle.com/datasets/colabsss/deep-learning-building-cost-dataset). It is public and likely synthetic, so findings illustrate method rather than real-world cost benchmarks. Each case study lists its own limitations.
