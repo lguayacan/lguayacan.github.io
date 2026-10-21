@@ -2,7 +2,7 @@
 
 **SQL analysis in BigQuery** | Laura Camila Guayacan Ardila
 
-**Question:** which projects look unusually expensive per square foot, and why? Same 6,123-project dataset as the [regression case study](../cost-drivers/).
+**Question:** which projects look unusually expensive per square foot, and why? Same 6,123-project dataset ([Kaggle source](https://www.kaggle.com/datasets/colabsss/deep-learning-building-cost-dataset)) as the [regression case study](../cost-drivers/).
 
 ![Outliers by area](images/outliers_by_area.png)
 
