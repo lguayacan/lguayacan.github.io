@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Laura Camila Guayacan Ardila | Construction Analytics Portfolio</title>
-<meta name="description" content="Data analytics portfolio for construction cost management: regression, SQL and an interactive dashboard.">
+<meta name="description" content="Construction cost analytics portfolio: cost driver regression, SQL variance and outlier analysis, and an interactive cost dashboard.">
 <style>
   :root { --bg:#ffffff; --text:#1c2430; --muted:#5b6675; --accent:#1f3864; --card:#f3f6fb; --line:#d9e2f3; }
   @media (prefers-color-scheme: dark) {
@@ -31,33 +31,45 @@
 <main>
   <h1>Laura Camila Guayacan Ardila</h1>
   <p class="role">Construction cost analytics</p>
-  <p>I have about 7 years of experience in cost estimation for commercial and residential projects, and two master's degrees (Natural Resources Management and Development; Energy Efficiency and Sustainability in Construction). This portfolio applies data analysis to the questions a cost manager asks: what drives cost, which projects deviate, and what decision the numbers support.</p>
+  <p>One question, three approaches: <strong>what drives construction cost, and which projects deviate from what we would expect?</strong> The same dataset of 6,123 projects is analysed with regression, SQL and an interactive dashboard, in the language a project manager uses to make decisions.</p>
+
+  <h2>Key findings</h2>
+  <ul>
+    <li>Equipment is a largely fixed cost (about $100k per project), so it weighs 31.7% of cost on projects under 2,000 sq ft versus 7.2% above 10,000 sq ft.</li>
+    <li>Cost per sq ft outliers drop from 423 to 205 once equipment is removed: most of the "deviation" is a scale effect.</li>
+    <li>Weather and risk indices do not explain the outliers.</li>
+  </ul>
 
   <h2>Projects</h2>
   <div class="cards">
     <article class="card">
-      <h3>1. What drives construction cost?</h3>
-      <p>Multiple regression on 6,123 projects: which factors explain total cost, how well the model predicts, and a what-if simulator.</p>
-      <span class="tag">Regression</span><span class="tag">Google Sheets</span><span class="tag">Diagnostics</span>
+      <h3>1. Cost driver analysis</h3>
+      <p>Multiple regression: which factors explain total cost, forecast accuracy on a hold-out sample, and a what-if estimator.</p>
+      <span class="tag">Regression</span><span class="tag">Google Sheets</span><span class="tag">Cost estimation</span>
       <p><a href="projects/cost-drivers/">Read the case study</a></p>
     </article>
     <article class="card">
-      <h3>2. Cost outliers with SQL</h3>
-      <p>Which projects and segments deviate from normal, and why.</p>
-      <span class="tag">SQL</span><span class="tag">Outliers</span>
-      <p class="status">In progress</p>
+      <h3>2. Cost variance and outlier analysis</h3>
+      <p>SQL on BigQuery: which projects and segments deviate from normal unit cost, and why.</p>
+      <span class="tag">SQL</span><span class="tag">BigQuery</span><span class="tag">Variance analysis</span>
+      <p><a href="projects/sql-outliers/">Read the case study</a></p>
     </article>
     <article class="card">
-      <h3>3. Project dashboard with AI</h3>
-      <p>An interactive dashboard where AI explains the results in plain language, without doing the calculations.</p>
-      <span class="tag">HTML</span><span class="tag">Dashboard</span><span class="tag">AI</span>
-      <p class="status">Planned</p>
+      <h3>3. Project cost dashboard</h3>
+      <p>Interactive estimate with a range and a plain-language interpretation of the result (the AI layer interprets, it does not calculate).</p>
+      <span class="tag">HTML</span><span class="tag">Dashboard</span><span class="tag">Cost reporting</span>
+      <p><a href="dashboard/">Open the dashboard</a></p>
     </article>
   </div>
 
+  <h2>Skills shown</h2>
+  <p>
+    <span class="tag">Cost estimation</span><span class="tag">Cost control</span><span class="tag">Budget forecasting</span><span class="tag">Variance analysis</span><span class="tag">Risk assessment</span><span class="tag">Benchmarking</span><span class="tag">Multiple regression</span><span class="tag">SQL (BigQuery)</span><span class="tag">Data visualisation</span><span class="tag">Dashboards (HTML)</span><span class="tag">Stakeholder reporting</span>
+  </p>
+
   <h2>Contact</h2>
   <ul class="links">
-    <li><a href="LINKEDIN_URL">LinkedIn</a></li>
+    <li><a href="https://www.linkedin.com/in/lguayacan">LinkedIn</a></li>
   </ul>
 
   <footer>Datasets are public (Kaggle) and some are synthetic. Each case study states its limitations.</footer>
