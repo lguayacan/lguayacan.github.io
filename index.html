@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laura Camila Guayacan Ardila | Construction Analytics Portfolio</title>
+<meta name="description" content="Data analytics portfolio for construction cost management: regression, SQL and dashboards, by a civil engineer with 7 years of estimating experience.">
+<style>
+  :root { --bg:#ffffff; --text:#1c2430; --muted:#5b6675; --accent:#1f3864; --card:#f3f6fb; --line:#d9e2f3; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#10151d; --text:#e8edf5; --muted:#a3afc0; --accent:#8fb0ee; --card:#182130; --line:#2a3750; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Arial, Helvetica, sans-serif; background:var(--bg); color:var(--text); line-height:1.55; }
+  main { max-width: 880px; margin: 0 auto; padding: 48px 16px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 4px; color: var(--accent); }
+  .role { color: var(--muted); margin: 0 0 20px; font-size: 1.05rem; }
+  h2 { font-size: 1.25rem; margin: 40px 0 12px; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+  .cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+  .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+  .tag { display:inline-block; font-size:.75rem; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); margin:6px 6px 0 0; }
+  .status { font-size:.8rem; color: var(--muted); }
+  a { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  ul.links { list-style:none; padding:0; display:flex; flex-wrap:wrap; gap:16px; }
+  footer { margin-top: 48px; color: var(--muted); font-size: .85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Laura Camila Guayacan Ardila</h1>
+  <p class="role">Civil engineer | Cost management and data analytics | Amstelveen, Netherlands</p>
+  <p>I have about 7 years of experience in quantity surveying and cost estimation for commercial and residential projects, and two master's degrees (Natural Resources Management and Development; Energy Efficiency and Sustainability in Construction). This portfolio applies data analysis to the questions a cost manager asks: what drives cost, which projects deviate, and what decision the numbers support.</p>
+
+  <h2>Projects</h2>
+  <div class="cards">
+    <article class="card">
+      <h3>1. What drives construction cost?</h3>
+      <p>Multiple regression on 6,123 projects: which factors explain total cost, how well the model predicts, and a what-if simulator.</p>
+      <span class="tag">Regression</span><span class="tag">Google Sheets</span><span class="tag">Diagnostics</span>
+      <p><a href="projects/cost-drivers/">Read the case study</a></p>
+    </article>
+    <article class="card">
+      <h3>2. Cost outliers with SQL</h3>
+      <p>Which projects and segments deviate from normal, and why.</p>
+      <span class="tag">SQL</span><span class="tag">Outliers</span>
+      <p class="status">In progress</p>
+    </article>
+    <article class="card">
+      <h3>3. Project dashboard with AI</h3>
+      <p>An interactive dashboard where AI explains the results in plain language, without doing the calculations.</p>
+      <span class="tag">HTML</span><span class="tag">Dashboard</span><span class="tag">AI</span>
+      <p class="status">Planned</p>
+    </article>
+  </div>
+
+  <h2>Contact</h2>
+  <ul class="links">
+    <li><a href="LINKEDIN_URL">LinkedIn</a></li>
+    <li><a href="mailto:camila.guayacan@gmail.com">Email</a></li>
+  </ul>
+
+  <footer>Datasets are public (Kaggle) and some are synthetic. Each case study states its limitations.</footer>
+</main>
+</body>
+</html>
