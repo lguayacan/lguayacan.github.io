@@ -1,6 +1,6 @@
 # Where do cost outliers come from?
 
-**SQL analysis in BigQuery** | Laura Camila Guayacan Ardila, civil engineer (cost estimation and quantity surveying)
+**SQL analysis in BigQuery** | Laura Camila Guayacan Ardila
 
 **Question:** which projects look unusually expensive per square foot, and why? Same 6,123-project dataset as the [regression case study](../cost-drivers/).
 
